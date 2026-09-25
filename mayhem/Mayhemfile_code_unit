@@ -1,0 +1,9 @@
+project: savantenvs/sui
+target: code_unit
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/code_unit/testsuite
+cmds:
+  - cmd: /mayhem/code_unit
+    libfuzzer: true
+    timeout: 10

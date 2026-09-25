@@ -1,0 +1,10 @@
+project: savantenvs/sui
+target: deserialize_verify
+testsuite:
+  - https://$MAYHEM_DOMAIN/$MAYHEM_PROJECT/$MAYHEM_TARGET/testsuite.tar
+  - file://mayhem/deserialize_verify/testsuite
+cmds:
+  - cmd: /mayhem/deserialize_verify
+    libfuzzer: true
+    timeout: 10
+    dictionary: /mayhem/deserialize_verify.dict
