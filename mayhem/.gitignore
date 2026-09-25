@@ -1,0 +1,8 @@
+# mayhem/build.sh writes every build artifact to the repo-root target/ tree (already covered by
+# sui's own .gitignore) precisely so that nothing compiled ever lands under mayhem/ — the
+# conformance gate content-greps this directory, and an ASan-linked binary's symbol table trips it.
+# These entries are belt-and-braces for anyone who runs cargo by hand inside mayhem/fuzz or
+# mayhem/kat without going through build.sh.
+build-out/
+fuzz/target/
+kat/target/

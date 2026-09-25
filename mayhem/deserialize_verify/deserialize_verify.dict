@@ -1,0 +1,54 @@
+# libFuzzer dictionary for the Move binary-format deserializer (mayhem/fuzz deserialize_verify).
+#
+# Every token is lifted from move-binary-format's own file_format_common.rs, so these are the
+# literal byte sequences the decoder branches on rather than guesses:
+#   BinaryConstants::MOVE_MAGIC / UNPUBLISHABLE_MAGIC, the little-endian u32 version words
+#   (VERSION_MIN=5 .. VERSION_MAX=7, plus 4 and 8 to probe either side of the accepted range),
+#   the TableType discriminants, and a complete magic+version+table-count header prefix.
+#
+# Form rules libFuzzer enforces (a violation aborts dict parsing BEFORE the first input runs,
+# leaving the target at zero edges while still looking healthy): one entry per line, the value
+# double-quoted, and only \\ \" \xHH escapes — no \n, no \t. Verified against the built binary
+# with `deserialize_verify -dict=<this file> -runs=1`, which must print "Dictionary: N entries"
+# and no ParseDictionaryFile error.
+
+# ── file magic ───────────────────────────────────────────────────────────────
+move_magic="\xa1\x1c\xeb\x0b"
+unpublishable_magic="\xde\xad\xc0\xde"
+
+# ── magic + little-endian version word (the first 8 bytes of every module) ───
+hdr_v5="\xa1\x1c\xeb\x0b\x05\x00\x00\x00"
+hdr_v6="\xa1\x1c\xeb\x0b\x06\x00\x00\x00"
+hdr_v7="\xa1\x1c\xeb\x0b\x07\x00\x00\x00"
+hdr_v4_below_min="\xa1\x1c\xeb\x0b\x04\x00\x00\x00"
+hdr_v8_above_max="\xa1\x1c\xeb\x0b\x08\x00\x00\x00"
+
+# ── magic + version + a plausible table count (HEADER_SIZE = 4 magic + 4 version + 1 count) ──
+hdr_v6_1table="\xa1\x1c\xeb\x0b\x06\x00\x00\x00\x01"
+hdr_v6_13tables="\xa1\x1c\xeb\x0b\x06\x00\x00\x00\x0d"
+
+# ── TableType discriminants (first byte of each 9-byte table header) ─────────
+tbl_module_handles="\x01"
+tbl_datatype_handles="\x02"
+tbl_function_handles="\x03"
+tbl_function_inst="\x04"
+tbl_signatures="\x05"
+tbl_constant_pool="\x06"
+tbl_identifiers="\x07"
+tbl_address_identifiers="\x08"
+tbl_struct_defs="\x0a"
+tbl_struct_def_inst="\x0b"
+tbl_function_defs="\x0c"
+tbl_field_handle="\x0d"
+tbl_field_inst="\x0e"
+tbl_friend_decls="\x0f"
+tbl_metadata="\x10"
+tbl_enum_defs="\x11"
+tbl_enum_def_inst="\x12"
+tbl_variant_handles="\x13"
+tbl_variant_inst_handles="\x14"
+
+# ── ULEB128 shapes the table-offset/count reader trips on ───────────────────
+uleb_zero="\x00"
+uleb_max_u32="\xff\xff\xff\xff\x0f"
+uleb_overlong="\x80\x80\x80\x80\x80\x00"

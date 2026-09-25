@@ -1,0 +1,21 @@
+[package]
+name = "sui-mayhem-kat"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[[bin]]
+name = "kat"
+path = "main.rs"
+
+[dependencies.move-binary-format]
+path = "../../external-crates/move/crates/move-binary-format"
+
+[dependencies.move-bytecode-verifier]
+path = "../../external-crates/move/crates/move-bytecode-verifier"
+
+# Isolated from sui's root workspace for the same reason as mayhem/fuzz/Cargo.toml — see the
+# comment there. Built with NORMAL flags (no sanitizer, no DWARF3 anchor): this is a functional
+# oracle, not a triage artifact.
+[workspace]
+members = ["."]
